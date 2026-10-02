@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ambrin: tokenized compute and data for agents</title>
+  <meta name="description" content="Ambrin turns inference, GPU time and data feeds into tokenized credits that agents spend per call. Every call settles on-ledger and leaves a private, verifiable receipt." />
+  <meta name="theme-color" content="#070605" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Ambrin" />
+  <meta property="og:title" content="Ambrin: metered intelligence, settled on-ledger" />
+  <meta property="og:description" content="Tokenized credits for inference, GPU time and data feeds. Agents spend per call. Every call leaves a private, verifiable receipt." />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Ambrin: metered intelligence, settled on-ledger" />
+  <meta name="twitter:description" content="Tokenized credits for inference, GPU time and data feeds. Agents spend per call. Every call leaves a private, verifiable receipt." />
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Lexend:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- Icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-hex" viewBox="0 0 24 24"><path d="M12 2.8 20 7.4v9.2l-8 4.6-8-4.6V7.4zM12 12l8-4.6M12 12v9.2M12 12 4 7.4"/></symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24"><rect x="5.5" y="5.5" width="13" height="13" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx=".6"/><path d="M9 2.5v3M15 2.5v3M9 18.5v3M15 18.5v3M2.5 9h3M2.5 15h3M18.5 9h3M18.5 15h3"/></symbol>
+    <symbol id="i-feed" viewBox="0 0 24 24"><path d="M4.5 11.5a8 8 0 0 1 8 8M4.5 5a14.5 14.5 0 0 1 14.5 14.5"/><circle cx="5.5" cy="18.5" r="1.4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M5 17.5a8.5 8.5 0 1 1 14 0M12 13.5l4-5"/><circle cx="12" cy="13.5" r="1.2"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3.5h12v17l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5zM9 8.5h6M9 12h6"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><path d="M7.5 10.5V8a4.5 4.5 0 0 1 9 0v2.5"/><rect x="5.5" y="10.5" width="13" height="9.5" rx="1.5"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M9.5 6A9 9 0 0 1 12 5.5C18 5.5 21.5 12 21.5 12a14 14 0 0 1-2.8 3.5M15.5 17.7A8.5 8.5 0 0 1 12 18.5C6 18.5 2.5 12 2.5 12a14 14 0 0 1 3.7-4.2M4 4l16 16"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M10 12.5h5M10 16h5"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M5 15.5V6A1.5 1.5 0 0 1 6.5 4.5H15"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s6.5-5.7 6.5-11a6.5 6.5 0 1 0-13 0c0 5.3 6.5 11 6.5 11z"/><circle cx="12" cy="10" r="2.2"/></symbol>
+    <symbol id="i-stream" viewBox="0 0 24 24"><path d="M3 8.5c3-3 6 3 9 0s6-3 9 0M3 15.5c3-3 6 3 9 0s6-3 9 0"/></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="12" cy="7" rx="7" ry="3"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/></symbol>
+    <symbol id="i-nodes" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M8.2 6h7.6M7 8l4 8M17 8l-4 8"/></symbol>
+    <symbol id="i-table" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="1.5"/><path d="M3.5 10h17M9.5 5v14"/></symbol>
+    <symbol id="i-scope" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></symbol>
+    <symbol id="g-diamond" viewBox="0 0 12 12"><path d="M6 1.2 10.8 6 6 10.8 1.2 6z"/></symbol>
+    <symbol id="g-hex" viewBox="0 0 12 12"><path d="M6 1 10.3 3.5v5L6 11 1.7 8.5v-5z"/></symbol>
+    <symbol id="g-square" viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1.5"/></symbol>
+    <symbol id="g-plus" viewBox="0 0 12 12"><path d="M4.8 1h2.4v3.8H11v2.4H7.2V11H4.8V7.2H1V4.8h3.8z"/></symbol>
+    <symbol id="g-ring" viewBox="0 0 12 12"><path fill-rule="evenodd" d="M6 1a5 5 0 1 1 0 10A5 5 0 0 1 6 1zm0 2.6a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8z"/></symbol>
+    <symbol id="g-tri" viewBox="0 0 12 12"><path d="M6 1.5 11 10.5H1z"/></symbol>
+    <symbol id="mark" viewBox="0 0 32 32"><path d="M7.5 24.5 16 6.5l8.5 18" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="13.1" y="18.1" width="5.8" height="5.8" rx="1" transform="rotate(45 16 21)" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<!-- Announcement -->
+<div class="announce">
+  <p>Ambrin is pre-launch. Early access is open for agent builders and capacity providers.</p>
+  <a href="#access">Request access <svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+</div>
+
+<!-- Nav -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="logo" aria-label="Ambrin home">
+      <svg class="logo-mark" width="26" height="26" aria-hidden="true"><use href="#mark"/></svg>
+      <span>Ambrin</span>
+    </a>
+    <nav class="nav-links" id="navLinks" aria-label="Primary">
+      <a href="#how">How it works</a>
+      <a href="#metered">What's metered</a>
+      <a href="#receipt">Receipts</a>
+      <a href="#audit">Audit trail</a>
+      <a href="#developers">Developers</a>
+      <a href="#faq">FAQ</a>
+      <a href="#access" class="btn btn-light nav-links-cta">Request access</a>
+    </nav>
+    <div class="nav-right">
+      <a href="#access" class="btn btn-light btn-sm nav-cta">Request access</a>
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-copy">
+      <h1>Metered intelligence, <span class="accent">settled <span class="nw">on-ledger.</span></span></h1>
+      <p class="hero-sub">Ambrin turns inference, GPU time and data feeds into tokenized credits. Agents spend them per call, and every call leaves a private, verifiable receipt.</p>
+      <div class="hero-cta">
+        <a href="#access" class="btn btn-light">Request access</a>
+        <a href="#receipt" class="btn btn-ghost">See a receipt</a>
+      </div>
+    </div>
+
+    <div class="hero-stage">
+      <canvas class="hero-dial" id="heroDial" aria-hidden="true"></canvas>
+      <figure class="meter" id="meter" aria-label="Simulated demo. An agent makes metered calls to three providers. Its credit balance ticks down and a receipt appears for each call.">
+        <div class="meter-term" aria-hidden="true">
+          <div class="win-bar">
+            <span class="win-dot"></span>
+            <span class="win-title">research-agent-07</span>
+            <span class="win-meta">session</span>
+            <span class="tag tag-sim">Simulated</span>
+          </div>
+          <div class="term" id="term"><div class="tl"><span class="t-p">$</span> <span class="t-k">call</span> <span class="t-c">inference.north/chat</span></div><div class="tl t-ok">  <span class="t-g">&#10003;</span> 2,310 tok &middot; <b>0.004620 cr</b></div><div class="tl"><span class="t-p">$</span> <span class="t-k">call</span> <span class="t-c">feeds.lantern/fx-spot</span></div><div class="tl t-ok">  <span class="t-g">&#10003;</span> 1 query &middot; <b>0.000400 cr</b></div><div class="tl"><span class="t-p">$</span> <span class="t-k">call</span> <span class="t-c">inference.north/chat</span></div><div class="tl t-ok">  <span class="t-g">&#10003;</span> 1,127 tok &middot; <b>0.002254 cr</b></div><div class="tl"><span class="t-p">$</span> <span class="t-k">call</span> <span class="t-c">inference.north/chat</span></div><div class="tl t-ok">  <span class="t-g">&#10003;</span> 904 tok &middot; <b>0.001808 cr</b></div><div class="tl"><span class="t-p">$</span> <span class="t-k">call</span> <span class="t-c">feeds.lantern/fx-spot</span></div><div class="tl t-ok">  <span class="t-g">&#10003;</span> 1 query &middot; <b>0.000400 cr</b></div><div class="tl"><span class="t-p">$</span> <span class="t-k">call</span> <span class="t-c">inference.north/chat</span></div><div class="tl t-ok">  <span class="t-g">&#10003;</span> 1,842 tok &middot; <b>0.003684 cr</b></div><div class="tl"><span class="t-p">$</span> <span class="t-k">call</span> <span class="t-c">feeds.lantern/fx-spot</span></div><div class="tl t-ok">  <span class="t-g">&#10003;</span> 1 query &middot; <b>0.000400 cr</b></div><div class="tl"><span class="t-p">$</span> <span class="t-k">call</span> <span class="t-c">gpu-pool-eu/a-class</span></div><div class="tl t-ok">  <span class="t-g">&#10003;</span> 18 GPU-s &middot; <b>0.225000 cr</b></div></div>
+        </div>
+        <div class="meter-wallet" aria-hidden="true">
+          <div class="wallet-top">
+            <div>
+              <span class="mono-label">Credit balance</span>
+              <div class="wallet-balance"><span id="balance">249.7614</span><small>cr</small></div>
+            </div>
+            <div class="wallet-budget">
+              <span class="mono-label">Daily budget</span>
+              <div class="wallet-budget-n"><span id="budgetUsed">8.43</span> / 25 cr</div>
+              <div class="bar"><i id="budgetBar" style="width:33.7%"></i></div>
+            </div>
+          </div>
+          <div class="rcpts-head"><span class="mono-label">Receipts</span><span class="mono-label">private to buyer + provider</span></div>
+          <ul class="rcpts" id="rcpts">
+            <li><svg class="g g-gpu"><use href="#g-square"/></svg><div><b>gpu-pool-eu</b><small>18 GPU-s &middot; rcpt_c41e07</small></div><span class="amt">&minus;0.225000</span></li>
+            <li><svg class="g g-data"><use href="#g-diamond"/></svg><div><b>feeds.lantern</b><small>1 query &middot; rcpt_a90b3d</small></div><span class="amt">&minus;0.000400</span></li>
+            <li><svg class="g g-inf"><use href="#g-hex"/></svg><div><b>inference.north</b><small>1,842 tok &middot; rcpt_7f3a9c</small></div><span class="amt">&minus;0.003684</span></li>
+            <li><svg class="g g-inf"><use href="#g-hex"/></svg><div><b>inference.north</b><small>904 tok &middot; rcpt_52d8e1</small></div><span class="amt">&minus;0.001808</span></li>
+          </ul>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROBLEM ============ -->
+<section class="section problem" id="problem">
+  <div class="wrap">
+    <div class="head head-split">
+      <div>
+        <p class="label"><span class="label-chip"><svg aria-hidden="true"><use href="#g-tri"/></svg></span>The problem</p>
+        <h2><span class="s">Agents spend all day.</span> <span class="s">The bill arrives next month.</span></h2>
+      </div>
+      <p class="head-aside">Agents pay for inference, GPUs and data the way a web app did ten years ago: one shared API key and a monthly invoice. That holds up for one service. It falls apart with forty agents making thousands of calls an hour.</p>
+    </div>
+
+    <ol class="trio">
+      <li>
+        <span class="trio-n">1</span>
+        <svg class="wire" viewBox="0 0 320 250" role="img" aria-label="One key fanning out to seven agents">
+          <path class="w-dot" d="M51.2 168.8A154 154 0 0 0 268.8 168.8"/>
+          <g class="w-line"><path d="M160 60 51 169M160 60 83 193M160 60 120 209M160 60v154M160 60l40 149M160 60l77 133M160 60l109 109"/></g>
+          <circle class="w-line" cx="160" cy="60" r="26"/>
+          <rect class="w-dot" x="146" y="46" width="28" height="28"/>
+          <g class="w-v w-cyan"><path d="M51 164l5 5-5 5-5-5zM83 188l5 5-5 5-5-5zM120 204l5 5-5 5-5-5zM160 209l5 5-5 5-5-5zM200 204l5 5-5 5-5-5zM237 188l5 5-5 5-5-5zM269 164l5 5-5 5-5-5z"/></g>
+          <path class="w-v w-cyan" d="M160 55l5 5-5 5-5-5z"/>
+          <text x="196" y="64">1 KEY</text>
+          <text x="160" y="240" text-anchor="middle">N AGENTS</text>
+        </svg>
+        <h3>One key, many agents</h3>
+        <p>Every agent draws on the same key and the same account. There is no budget per agent, so one runaway loop spends everyone's money.</p>
+      </li>
+      <li>
+        <span class="trio-n">2</span>
+        <svg class="wire" viewBox="0 0 320 250" role="img" aria-label="An invoice page with hidden line items and a single total">
+          <path class="w-dot" d="M126 26h92v178M118 34h92"/>
+          <path class="w-line" d="M102 42h92v178h-92z"/>
+          <g class="w-dot"><path d="M116 66h64M116 82h64M116 98h64M116 114h64M116 130h64M116 146h64M116 162h64"/></g>
+          <path class="w-line" d="M116 192h64"/>
+          <g class="w-v w-coral"><circle cx="102" cy="42" r="4"/><circle cx="194" cy="42" r="4"/><circle cx="102" cy="220" r="4"/><circle cx="194" cy="220" r="4"/><circle cx="180" cy="192" r="4"/></g>
+          <text x="208" y="196">TOTAL</text>
+          <text x="208" y="118">? CALLS</text>
+        </svg>
+        <h3>An invoice is not a record</h3>
+        <p>The provider sends one total at month end. It can't tell you which agent made which call, or what that call cost.</p>
+      </li>
+      <li>
+        <span class="trio-n">3</span>
+        <svg class="wire" viewBox="0 0 320 250" role="img" aria-label="Two overlapping circles, your logs and their bill, that do not line up">
+          <circle class="w-line" cx="124" cy="120" r="78"/>
+          <circle class="w-line" cx="196" cy="120" r="78"/>
+          <path class="w-dot" d="M124 120h72M160 50.8v138.4"/>
+          <g class="w-v w-purple"><rect x="156" y="46.8" width="8" height="8"/><rect x="156" y="185.2" width="8" height="8"/><rect x="120" y="116" width="8" height="8"/><rect x="192" y="116" width="8" height="8"/></g>
+          <text x="84" y="226" text-anchor="middle">YOUR LOGS</text>
+          <text x="236" y="226" text-anchor="middle">THEIR BILL</text>
+        </svg>
+        <h3>Reconciliation after the fact</h3>
+        <p>You learn what happened by joining logs against a bill, weeks later, and trusting that both sides counted the same way.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section band" id="how">
+  <div class="wrap">
+    <div class="head">
+      <p class="label"><span class="label-chip"><svg aria-hidden="true"><use href="#g-plus"/></svg></span>How it works</p>
+      <h2><span class="s">Capacity in. Credits out.</span> <span class="s">A receipt for every call.</span></h2>
+    </div>
+
+    <ol class="flow">
+      <li class="flow-step">
+        <div class="node" aria-hidden="true">
+          <span class="pulse"></span>
+          <div class="node-top"><span class="mono-label">Provider</span><span class="node-id">gpu-pool-eu</span></div>
+          <div class="cells cells-sq" data-n="48" data-on="15"></div>
+          <dl class="node-kv">
+            <div><dt>Listed</dt><dd>40,000 GPU-s</dd></div>
+            <div><dt>Issued</dt><dd class="hi">500 cr</dd></div>
+          </dl>
+        </div>
+        <span class="flow-n">01</span>
+        <h3>Providers tokenize capacity</h3>
+        <p>A provider lists inference, GPU time or a data feed and issues credits against it. Each credit is a claim on metered units at a stated price.</p>
+      </li>
+      <li class="flow-step">
+        <div class="node" aria-hidden="true">
+          <span class="pulse"></span>
+          <div class="node-top"><span class="mono-label">Wallet</span><span class="node-id">research-agent-07</span></div>
+          <div class="node-big">250.00<small>cr</small></div>
+          <dl class="node-kv">
+            <div><dt>Per call</dt><dd>0.02 cr</dd></div>
+            <div><dt>Per day</dt><dd>25 cr</dd></div>
+          </dl>
+        </div>
+        <span class="flow-n">02</span>
+        <h3>Agents buy credits</h3>
+        <p>The agent's owner funds a wallet and sets a budget. The agent holds credits only for the providers it is allowed to use.</p>
+      </li>
+      <li class="flow-step">
+        <div class="node" aria-hidden="true">
+          <span class="pulse"></span>
+          <div class="node-top"><span class="mono-label">Call</span><span class="node-id">inference.north/chat</span></div>
+          <div class="node-calc">
+            <span>1,842 <i>tokens</i></span>
+            <span>&times; 0.000002 <i>cr</i></span>
+            <span class="hi">= 0.003684 <i>cr</i></span>
+          </div>
+        </div>
+        <span class="flow-n">03</span>
+        <h3>Credits are spent per call</h3>
+        <p>Each call states its units. Credits move from the agent to the provider as the call is served. No shared key, no running tab.</p>
+      </li>
+      <li class="flow-step">
+        <div class="node" aria-hidden="true">
+          <div class="node-top"><span class="mono-label">Receipt</span><span class="node-id">rcpt_7f3a9c</span></div>
+          <ul class="node-checks">
+            <li><svg class="ico"><use href="#i-check"/></svg>Credits transferred</li>
+            <li><svg class="ico"><use href="#i-check"/></svg>Receipt created</li>
+            <li><svg class="ico"><use href="#i-lock"/></svg>Buyer + provider only</li>
+          </ul>
+        </div>
+        <span class="flow-n">04</span>
+        <h3>The call settles and emits a receipt</h3>
+        <p>Payment and receipt are one atomic transaction. Either both happen or neither does.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ WHAT'S METERED ============ -->
+<section class="section metered" id="metered">
+  <div class="wrap">
+    <div class="head">
+      <p class="label"><span class="label-chip"><svg aria-hidden="true"><use href="#g-hex"/></svg></span>What's metered</p>
+      <h2><span class="s">Three kinds of capacity.</span> <span class="s">One way to pay for them.</span></h2>
+    </div>
+
+    <div class="prod" data-tabs>
+      <div class="prod-tabs" role="tablist" aria-label="Metered resources" aria-orientation="vertical">
+        <button class="prod-tab" role="tab" id="mt-inf" aria-controls="mp-inf" aria-selected="true" type="button"><svg class="ico" aria-hidden="true"><use href="#i-hex"/></svg>Inference</button>
+        <button class="prod-tab" role="tab" id="mt-gpu" aria-controls="mp-gpu" aria-selected="false" tabindex="-1" type="button"><svg class="ico" aria-hidden="true"><use href="#i-chip"/></svg>GPU time</button>
+        <button class="prod-tab" role="tab" id="mt-data" aria-controls="mp-data" aria-selected="false" tabindex="-1" type="button"><svg class="ico" aria-hidden="true"><use href="#i-feed"/></svg>Data feeds</button>
+      </div>
+
+      <!-- Inference -->
+      <div class="prod-panel" role="tabpanel" id="mp-inf" aria-labelledby="mt-inf">
+        <div class="prod-text">
+          <h3>Inference, metered by the token</h3>
+          <p class="prod-lead">Input and output tokens are counted on every call and priced per unit. The receipt carries both counts.</p>
+          <ul class="minis">
+            <li><h4><svg class="ico" aria-hidden="true"><use href="#i-coins"/></svg>Unit: tokens</h4><p>Input and output are counted separately, each at its own unit price.</p></li>
+            <li><h4><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg>Budget per agent</h4><p>Cap spend per call, per day or per task. A call over budget fails before it runs.</p></li>
+            <li><h4><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>Model on the receipt</h4><p>The receipt names the model and version that served the call.</p></li>
+          </ul>
+        </div>
+        <div class="viz viz-hex">
+          <div class="viz-cap"><span class="mono-label">Inference</span><span class="mono-label dim">inference.north</span></div>
+          <div class="codecard">
+            <pre class="code" data-lang="ts" tabindex="0" role="region" aria-label="Inference call example"><code>const res = await agent.call("inference.north/chat", {
+  model: "north-large-2",
+  messages,
+  maxSpend: "0.02 cr",
+});
+
+res.receipt.units; // { input: 1204, output: 638 }</code></pre>
+          </div>
+          <div class="meterline"><span>1,842 tokens</span><i>&times;</i><span>0.000002 cr</span><i>=</i><b>0.003684 cr</b></div>
+        </div>
+      </div>
+
+      <!-- GPU -->
+      <div class="prod-panel" role="tabpanel" id="mp-gpu" aria-labelledby="mt-gpu" hidden>
+        <div class="prod-text">
+          <h3>GPU time, metered by the second</h3>
+          <p class="prod-lead">Start a job, stream usage, stop when it's done. Credits are drawn down while the job runs and the last receipt closes the session.</p>
+          <ul class="minis">
+            <li><h4><svg class="ico" aria-hidden="true"><use href="#i-clock"/></svg>Unit: GPU-seconds</h4><p>Charged for the seconds a job holds the device, priced by device class.</p></li>
+            <li><h4><svg class="ico" aria-hidden="true"><use href="#i-stream"/></svg>Streaming spend</h4><p>Long jobs settle in intervals, so a crash never leaves an open tab.</p></li>
+            <li><h4><svg class="ico" aria-hidden="true"><use href="#i-stop"/></svg>Hard stop at the cap</h4><p>When the session budget is spent the job is halted and the receipt is final.</p></li>
+          </ul>
+        </div>
+        <div class="viz viz-sq">
+          <div class="viz-cap"><span class="mono-label">GPU time</span><span class="mono-label dim">gpu-pool-eu</span></div>
+          <div class="codecard">
+            <pre class="code" data-lang="ts" tabindex="0" role="region" aria-label="GPU job example"><code>const job = await agent.run("gpu-pool-eu/a-class", {
+  image: "trainer:4.2",
+  maxSpend: "12 cr",
+});
+
+await job.done(); // 312 GPU-seconds, 1 receipt</code></pre>
+          </div>
+          <div class="meterline"><span>312 GPU-s</span><i>&times;</i><span>0.0125 cr</span><i>=</i><b>3.900000 cr</b></div>
+        </div>
+      </div>
+
+      <!-- Data -->
+      <div class="prod-panel" role="tabpanel" id="mp-data" aria-labelledby="mt-data" hidden>
+        <div class="prod-text">
+          <h3>Data feeds, metered by the query</h3>
+          <p class="prod-lead">Price feeds, search indexes, licensed datasets. Each query is one metered unit, or priced by the rows it returns.</p>
+          <ul class="minis">
+            <li><h4><svg class="ico" aria-hidden="true"><use href="#i-table"/></svg>Unit: queries or rows</h4><p>The provider picks the unit. The receipt states which one was counted.</p></li>
+            <li><h4><svg class="ico" aria-hidden="true"><use href="#i-scope"/></svg>Scoped to a feed</h4><p>Credits are tied to a feed. An agent can only spend where its owner allowed it.</p></li>
+            <li><h4><svg class="ico" aria-hidden="true"><use href="#i-eye-off"/></svg>Nothing leaks sideways</h4><p>A feed provider sees receipts for its own feed and nothing about your other spend.</p></li>
+          </ul>
+        </div>
+        <div class="viz viz-dia">
+          <div class="viz-cap"><span class="mono-label">Data feed</span><span class="mono-label dim">feeds.lantern</span></div>
+          <div class="codecard">
+            <pre class="code" data-lang="ts" tabindex="0" role="region" aria-label="Data feed query example"><code>const fx = await agent.query("feeds.lantern/fx-spot", {
+  pairs: ["EUR/USD", "USD/JPY"],
+  maxSpend: "0.01 cr",
+});
+
+fx.receipt.total; // "0.0004 cr"</code></pre>
+          </div>
+          <div class="meterline"><span>1 query</span><i>&times;</i><span>0.0004 cr</span><i>=</i><b>0.000400 cr</b></div>
+        </div>
+      </div>
+    </div>
+    <p class="fineprint">Provider names, units and prices on this page are illustrative. Providers set their own unit prices.</p>
+  </div>
+</section>
+
+<!-- ============ RECEIPT (light) ============ -->
+<section class="section light" id="receipt" data-nav="light">
+  <div class="wrap rc">
+    <div class="rc-head">
+      <p class="label"><span class="label-chip"><svg aria-hidden="true"><use href="#g-diamond"/></svg></span>The receipt</p>
+      <h2>Every call leaves a receipt.</h2>
+      <p class="rc-lead">Not a log line you wrote yourself. A record both sides signed, created in the same transaction that moved the credits.</p>
+    </div>
+
+    <div class="rc-control">
+      <fieldset class="seg" id="viewAs">
+        <legend>View as</legend>
+        <label><input type="radio" name="viewas" value="buyer" checked /><span>Buyer</span></label>
+        <label><input type="radio" name="viewas" value="provider" /><span>Provider</span></label>
+        <label><input type="radio" name="viewas" value="other" /><span>Anyone else</span></label>
+      </fieldset>
+      <p class="rc-note" id="viewNote" aria-live="polite">The buyer sees the full receipt, plus its own wallet balance after the call.</p>
+    </div>
+
+    <div class="rc-points-wrap">
+      <dl class="rc-points">
+        <div>
+          <dt><svg class="ico" aria-hidden="true"><use href="#i-receipt"/></svg>What was called</dt>
+          <dd>Agent, provider, resource and model, with a call ID you can match to your own traces.</dd>
+        </div>
+        <div>
+          <dt><svg class="ico" aria-hidden="true"><use href="#i-coins"/></svg>What it cost</dt>
+          <dd>Units, unit price and total. The arithmetic is on the receipt, not in a pricing page you have to look up.</dd>
+        </div>
+        <div>
+          <dt><svg class="ico" aria-hidden="true"><use href="#i-eye"/></svg>Who can see it</dt>
+          <dd>The buyer and the provider. Nobody else on the network receives it.</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="rc-stage">
+      <div class="receipt-shadow">
+      <article class="receipt" id="receiptCard" data-view="buyer" aria-label="Example receipt">
+        <header class="receipt-head">
+          <div class="receipt-brand"><svg width="20" height="20" aria-hidden="true"><use href="#mark"/></svg><span>Receipt</span></div>
+          <span class="receipt-status"><i></i>Settled</span>
+        </header>
+        <p class="receipt-id"><span class="val">rcpt_7f3a9c21e</span></p>
+
+        <dl class="receipt-rows">
+          <div><dt>Call</dt><dd><span class="val">call_01JB2M8Q4T</span></dd></div>
+          <div><dt>Settled at</dt><dd><span class="val">2026-10-01 14:32:07 UTC</span></dd></div>
+          <div><dt>Agent</dt><dd><span class="val">research-agent-07</span></dd></div>
+          <div><dt>Buyer</dt><dd><span class="val">acme-agents<span class="hide-xs">::1220&hellip;9f3c</span></span></dd></div>
+          <div><dt>Provider</dt><dd><span class="val">inference.north<span class="hide-xs">::1220&hellip;4be0</span></span></dd></div>
+          <div><dt>Resource</dt><dd><span class="val">chat / north-large-2</span></dd></div>
+        </dl>
+
+        <table class="receipt-items">
+          <thead><tr><th scope="col">Units</th><th scope="col">Unit price</th><th scope="col">Amount</th></tr></thead>
+          <tbody>
+            <tr><td><span class="val">1,204 input<span class="hide-s"> tokens</span></span></td><td><span class="val">0.0000015</span></td><td><span class="val">0.001806</span></td></tr>
+            <tr><td><span class="val">638 output<span class="hide-s"> tokens</span></span></td><td><span class="val">0.0000030</span></td><td><span class="val">0.001914</span></td></tr>
+          </tbody>
+          <tfoot><tr><th scope="row" colspan="2">Total</th><td><span class="val">0.003720 cr</span></td></tr></tfoot>
+        </table>
+
+        <dl class="receipt-rows receipt-meta">
+          <div><dt>Contract</dt><dd><span class="val">00a4f1&hellip;d27e</span></dd></div>
+          <div><dt>Signed by</dt><dd><span class="val">buyer, provider</span></dd></div>
+          <div class="row-wallet"><dt>Wallet after</dt><dd><span class="val">249.996280 cr</span><em>buyer only</em></dd></div>
+        </dl>
+
+        <footer class="receipt-foot">
+          <span>Visible to</span>
+          <span class="party party-buyer">Buyer</span>
+          <span class="party party-provider">Provider</span>
+          <span class="party party-other">Anyone else</span>
+        </footer>
+
+        <div class="receipt-veil" aria-hidden="true">
+          <svg class="ico"><use href="#i-eye-off"/></svg>
+          <b>Nothing to show</b>
+          <span>This party is not a stakeholder. The receipt is never sent to them.</span>
+        </div>
+      </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUDIT TRAIL ============ -->
+<section class="section audit" id="audit">
+  <div class="wrap">
+    <div class="head head-split">
+      <div>
+        <p class="label"><span class="label-chip"><svg aria-hidden="true"><use href="#g-square"/></svg></span>Audit trail</p>
+        <h2>What every agent used, and what it cost.</h2>
+      </div>
+      <p class="head-aside">Receipts roll up into a ledger the owner can query. Group by agent, by provider or by resource. Every total traces back to the individual calls behind it.</p>
+    </div>
+
+    <div class="dash" data-tabs>
+      <div class="dash-bar">
+        <div class="dash-title"><span class="win-dot"></span>Usage<span class="dash-range">last 24 hours</span><span class="tag tag-sim">Sample data</span></div>
+        <div class="dash-seg" role="tablist" aria-label="Group usage by">
+          <button role="tab" id="at-agent" aria-controls="ap-agent" aria-selected="true" type="button">By agent</button>
+          <button role="tab" id="at-prov" aria-controls="ap-prov" aria-selected="false" tabindex="-1" type="button">By provider</button>
+        </div>
+      </div>
+
+      <div class="dash-stats">
+        <div><span class="mono-label">Credits spent</span><b>46.02<small>cr</small></b></div>
+        <div><span class="mono-label">Calls</span><b>18,204</b></div>
+        <div><span class="mono-label">Receipts</span><b>18,204</b><span class="stat-note"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg>one per call</span></div>
+        <div><span class="mono-label">Over budget</span><b>0</b><span class="stat-note">37 calls refused</span></div>
+      </div>
+
+      <div class="dash-body">
+        <div class="dash-main">
+          <div role="tabpanel" id="ap-agent" aria-labelledby="at-agent">
+            <div class="tscroll" tabindex="0" role="region" aria-label="Usage by agent">
+              <table class="ledger">
+                <thead>
+                  <tr><th scope="col">Agent</th><th scope="col" class="num">Calls</th><th scope="col" class="num">Tokens</th><th scope="col" class="num">GPU-s</th><th scope="col" class="num">Queries</th><th scope="col" class="num">Spent</th><th scope="col">Daily budget</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row"><svg class="g g-inf" aria-hidden="true"><use href="#g-hex"/></svg>research-agent-07</th><td class="num">6,412</td><td class="num">9.8M</td><td class="num dim">&ndash;</td><td class="num">1,208</td><td class="num hi">22.14 cr</td><td><span class="budget"><span class="bar"><i style="width:89%"></i></span>89% of 25</span></td></tr>
+                  <tr><th scope="row"><svg class="g g-gpu" aria-hidden="true"><use href="#g-square"/></svg>trainer-agent-01</th><td class="num">14</td><td class="num dim">&ndash;</td><td class="num">1,116</td><td class="num dim">&ndash;</td><td class="num hi">13.95 cr</td><td><span class="budget"><span class="bar"><i style="width:70%"></i></span>70% of 20</span></td></tr>
+                  <tr><th scope="row"><svg class="g g-data" aria-hidden="true"><use href="#g-diamond"/></svg>pricing-agent-02</th><td class="num">9,930</td><td class="num">1.1M</td><td class="num dim">&ndash;</td><td class="num">9,105</td><td class="num hi">5.92 cr</td><td><span class="budget"><span class="bar"><i style="width:59%"></i></span>59% of 10</span></td></tr>
+                  <tr><th scope="row"><svg class="g g-inf" aria-hidden="true"><use href="#g-hex"/></svg>support-agent-11</th><td class="num">1,848</td><td class="num">2.4M</td><td class="num dim">&ndash;</td><td class="num">96</td><td class="num hi">4.01 cr</td><td><span class="budget"><span class="bar"><i style="width:80%"></i></span>80% of 5</span></td></tr>
+                </tbody>
+                <tfoot>
+                  <tr><th scope="row">4 agents</th><td class="num">18,204</td><td class="num">13.3M</td><td class="num">1,116</td><td class="num">10,409</td><td class="num hi">46.02 cr</td><td></td></tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="ap-prov" aria-labelledby="at-prov" hidden>
+            <div class="tscroll" tabindex="0" role="region" aria-label="Usage by provider">
+              <table class="ledger">
+                <thead>
+                  <tr><th scope="col">Provider</th><th scope="col">Resource</th><th scope="col" class="num">Calls</th><th scope="col" class="num">Units</th><th scope="col" class="num">Spent</th><th scope="col">Share of spend</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row"><svg class="g g-inf" aria-hidden="true"><use href="#g-hex"/></svg>inference.north</th><td>Inference</td><td class="num">7,781</td><td class="num">13.3M tokens</td><td class="num hi">27.91 cr</td><td><span class="budget"><span class="bar"><i style="width:60.6%"></i></span>60.6%</span></td></tr>
+                  <tr><th scope="row"><svg class="g g-gpu" aria-hidden="true"><use href="#g-square"/></svg>gpu-pool-eu</th><td>GPU time</td><td class="num">14</td><td class="num">1,116 GPU-s</td><td class="num hi">13.95 cr</td><td><span class="budget"><span class="bar"><i style="width:30.3%"></i></span>30.3%</span></td></tr>
+                  <tr><th scope="row"><svg class="g g-data" aria-hidden="true"><use href="#g-diamond"/></svg>feeds.lantern</th><td>Data feed</td><td class="num">10,409</td><td class="num">10,409 queries</td><td class="num hi">4.16 cr</td><td><span class="budget"><span class="bar"><i style="width:9%"></i></span>9.0%</span></td></tr>
+                </tbody>
+                <tfoot>
+                  <tr><th scope="row">3 providers</th><td></td><td class="num">18,204</td><td></td><td class="num hi">46.02 cr</td><td></td></tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-side" role="img" aria-label="Bar chart of credits spent per hour over the last 24 hours, with one tall bar where a GPU job ran">
+          <div class="chart-head"><span class="mono-label">Spend per hour</span><span class="chart-legend"><i class="k-inf"></i>calls<i class="k-gpu"></i>GPU job</span></div>
+          <div class="chart" aria-hidden="true">
+            <i style="--h:18%"></i><i style="--h:14%"></i><i style="--h:11%"></i><i style="--h:9%"></i><i style="--h:12%"></i><i style="--h:16%"></i>
+            <i style="--h:24%"></i><i style="--h:33%"></i><i style="--h:41%"></i><i class="gpu" style="--h:92%"></i><i class="gpu" style="--h:78%"></i><i style="--h:38%"></i>
+            <i style="--h:44%"></i><i style="--h:36%"></i><i style="--h:47%"></i><i style="--h:52%"></i><i style="--h:40%"></i><i style="--h:31%"></i>
+            <i style="--h:35%"></i><i style="--h:27%"></i><i style="--h:22%"></i><i style="--h:25%"></i><i style="--h:19%"></i><i style="--h:21%"></i>
+          </div>
+          <div class="chart-axis" aria-hidden="true"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>now</span></div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="notes">
+      <li>
+        <h3><svg class="ico" aria-hidden="true"><use href="#i-gauge"/></svg>Budgets that hold</h3>
+        <p>A budget is checked in the same transaction that spends the credits. An agent can't overspend and settle up later.</p>
+      </li>
+      <li>
+        <h3><svg class="ico" aria-hidden="true"><use href="#i-doc"/></svg>Totals that trace back</h3>
+        <p>Every number in the table is a sum of receipts. Open any row and you are looking at individual calls.</p>
+      </li>
+      <li>
+        <h3><svg class="ico" aria-hidden="true"><use href="#i-nodes"/></svg>One view across providers</h3>
+        <p>Inference, GPU time and data sit in the same ledger, in the same format, whoever sold the capacity.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ DEVELOPERS ============ -->
+<section class="section band" id="developers">
+  <div class="wrap dev">
+    <div class="dev-copy">
+      <p class="label"><span class="label-chip"><svg aria-hidden="true"><use href="#g-ring"/></svg></span>Developers</p>
+      <h2><span class="s">A budget in the call.</span> <span class="s">A receipt in the response.</span></h2>
+      <p class="dev-lead">Give each agent a wallet, set what it may spend, and call providers through one client. The receipt comes back next to the result.</p>
+      <ul class="ticks">
+        <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span><b>One wallet per agent.</b> No shared keys to rotate or leak.</span></li>
+        <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span><b>Limits enforced before the call.</b> Per call, per day or per task.</span></li>
+        <li><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span><b>The same receipt shape everywhere.</b> Inference, GPU time or data.</span></li>
+      </ul>
+      <p class="dev-note">The SDK is in private preview. Names and signatures may change before release.</p>
+    </div>
+
+    <div class="editor" data-tabs>
+      <div class="editor-bar">
+        <div class="editor-tabs" role="tablist" aria-label="Code examples">
+          <button role="tab" id="ct-ts" aria-controls="cp-ts" aria-selected="true" type="button">agent.ts</button>
+          <button role="tab" id="ct-py" aria-controls="cp-py" aria-selected="false" tabindex="-1" type="button">agent.py</button>
+          <button role="tab" id="ct-json" aria-controls="cp-json" aria-selected="false" tabindex="-1" type="button">receipt.json</button>
+        </div>
+        <button class="copy" id="copyBtn" type="button" aria-label="Copy code"><svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg><span>Copy</span></button>
+      </div>
+      <div role="tabpanel" id="cp-ts" aria-labelledby="ct-ts">
+        <pre class="code code-num" data-lang="ts" tabindex="0"><code>import { Ambrin } from "@ambrin/sdk";
+
+const ambrin = new Ambrin({ party: process.env.AMBRIN_PARTY });
+
+// One wallet per agent, with a hard budget.
+const agent = ambrin.agent("research-agent-07", {
+  budget: { perCall: "0.02 cr", perDay: "25 cr" },
+});
+
+const { output, receipt } = await agent.call("inference.north/chat", {
+  model: "north-large-2",
+  messages: [{ role: "user", content: "Summarise today's filings." }],
+});
+
+receipt.id;        // "rcpt_7f3a9c21e"
+receipt.total;     // "0.003720 cr"
+receipt.visibleTo; // ["buyer", "provider"]</code></pre>
+      </div>
+      <div role="tabpanel" id="cp-py" aria-labelledby="ct-py" hidden>
+        <pre class="code code-num" data-lang="py" tabindex="0"><code>import os
+from ambrin import Ambrin
+
+ambrin = Ambrin(party=os.environ["AMBRIN_PARTY"])
+
+# One wallet per agent, with a hard budget.
+agent = ambrin.agent(
+    "research-agent-07",
+    budget={"per_call": "0.02 cr", "per_day": "25 cr"},
+)
+
+result = agent.call(
+    "inference.north/chat",
+    model="north-large-2",
+    messages=[{"role": "user", "content": "Summarise today's filings."}],
+)
+
+result.receipt.id          # "rcpt_7f3a9c21e"
+result.receipt.total       # "0.003720 cr"
+result.receipt.visible_to  # ["buyer", "provider"]</code></pre>
+      </div>
+      <div role="tabpanel" id="cp-json" aria-labelledby="ct-json" hidden>
+        <pre class="code code-num" data-lang="json" tabindex="0"><code>{
+  "receipt": "rcpt_7f3a9c21e",
+  "call": "call_01JB2M8Q4T",
+  "agent": "research-agent-07",
+  "buyer": "acme-agents::1220…9f3c",
+  "provider": "inference.north::1220…4be0",
+  "resource": "chat/north-large-2",
+  "units": { "input_tokens": 1204, "output_tokens": 638 },
+  "unit_price": { "input_tokens": "0.0000015", "output_tokens": "0.0000030" },
+  "total": "0.003720",
+  "unit": "cr",
+  "settled_at": "2026-10-01T14:32:07Z",
+  "contract_id": "00a4f1…d27e",
+  "signatories": ["buyer", "provider"],
+  "visible_to": ["buyer", "provider"]
+}</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TWO SIDES ============ -->
+<section class="section sides" id="sides">
+  <div class="wrap">
+    <div class="head">
+      <p class="label"><span class="label-chip"><svg aria-hidden="true"><use href="#g-diamond"/></svg></span>Two sides, one ledger</p>
+      <h2>For the agent, and for the capacity behind it.</h2>
+    </div>
+
+    <div class="duo">
+      <article class="side">
+        <p class="mono-label hi">For agent builders</p>
+        <h3>Give every agent its own wallet and its own limit.</h3>
+        <div class="side-viz" aria-hidden="true">
+          <div class="policy">
+            <div class="policy-head"><span>research-agent-07</span><span class="tag">policy</span></div>
+            <div class="policy-row"><span>per call</span><b>0.02 cr</b></div>
+            <div class="policy-row"><span>per day</span><b>25 cr</b></div>
+            <div class="policy-row"><span>providers</span><b>inference.north<br />feeds.lantern</b></div>
+            <div class="policy-row"><span>over budget</span><b class="warn">refuse call</b></div>
+          </div>
+        </div>
+        <ul class="side-list">
+          <li>A wallet and a budget for each agent, not one key for all of them.</li>
+          <li>Calls fail closed when the budget is spent.</li>
+          <li>One receipt format across every provider.</li>
+          <li>An audit trail the person paying can read.</li>
+        </ul>
+        <a class="btn btn-ghost" href="#access">Request builder access</a>
+      </article>
+
+      <article class="side">
+        <p class="mono-label hi">For capacity providers</p>
+        <h3>Sell inference, GPU time or data as credits.</h3>
+        <div class="side-viz" aria-hidden="true">
+          <div class="policy">
+            <div class="policy-head"><span>gpu-pool-eu/a-class</span><span class="tag">listing</span></div>
+            <div class="stack"><i class="s-red" style="width:23%"></i><i class="s-sold" style="width:31%"></i><i class="s-open"></i></div>
+            <div class="policy-row"><span><i class="sw s-red"></i>redeemed</span><b>9,116 GPU-s</b></div>
+            <div class="policy-row"><span><i class="sw s-sold"></i>sold, unspent</span><b>12,400 GPU-s</b></div>
+            <div class="policy-row"><span><i class="sw s-open"></i>available</span><b>18,484 GPU-s</b></div>
+          </div>
+        </div>
+        <ul class="side-list">
+          <li>List capacity once and issue credits against it.</li>
+          <li>Get paid per call, at the moment of the call.</li>
+          <li>No invoice run, no collections, no arguments over counts.</li>
+          <li>You see receipts for your own capacity. Nothing else is exposed, to you or about you.</li>
+        </ul>
+        <a class="btn btn-ghost" href="#access">Talk to us about listing</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY ON-LEDGER ============ -->
+<section class="section band" id="ledger">
+  <div class="wrap">
+    <div class="head head-split">
+      <div>
+        <p class="label"><span class="label-chip"><svg aria-hidden="true"><use href="#g-hex"/></svg></span>Why on-ledger</p>
+        <h2>Settlement, not invoicing.</h2>
+      </div>
+      <p class="head-aside">Ambrin is built on the Canton Network, a public ledger where a contract is shared only with the parties to it. That is what lets a receipt be both private and provable.</p>
+    </div>
+
+    <div class="why">
+      <div class="timeline" aria-hidden="true">
+        <div class="tl-row">
+          <div class="tl-name"><span class="mono-label">Invoicing</span><span>meter now, charge later</span></div>
+          <div class="tl-track tl-dim"></div>
+          <ol class="tl-events">
+            <li><b>Month end</b>One invoice</li>
+            <li><b>Net 30</b>Payment</li>
+            <li><b>After that</b>Reconciliation</li>
+          </ol>
+        </div>
+        <div class="tl-row">
+          <div class="tl-name"><span class="mono-label hi">Ambrin</span><span>every call settles as it happens</span></div>
+          <div class="tl-track tl-lit"></div>
+          <ol class="tl-events tl-events-lit">
+            <li><b>Each call</b>Paid and receipted in one transaction</li>
+            <li><b>Month end</b>A report. Nothing left to settle.</li>
+          </ol>
+        </div>
+      </div>
+
+      <dl class="reasons">
+        <div>
+          <dt><span class="mono-label">01</span>Private to its stakeholders</dt>
+          <dd>A receipt is a contract between the buyer and the provider. Canton sends a contract only to the parties to it. Other participants don't see the amount, the counterparties, or that the call happened.</dd>
+        </div>
+        <div>
+          <dt><span class="mono-label">02</span>Verifiable by both sides</dt>
+          <dd>Buyer and provider hold the same signed record. Neither can edit it afterwards, and either can prove what it says.</dd>
+        </div>
+        <div>
+          <dt><span class="mono-label">03</span>Atomic</dt>
+          <dd>The credit transfer and the receipt are created in one transaction. There is no state where a call was paid for but not recorded, or recorded but not paid for.</dd>
+        </div>
+        <div>
+          <dt><span class="mono-label">04</span>Nothing to reconcile</dt>
+          <dd>Payment happens at the call. Month end becomes a report, not a negotiation.</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="section faq" id="faq">
+  <div class="wrap faq-grid">
+    <div class="faq-head">
+      <p class="label"><span class="label-chip"><svg aria-hidden="true"><use href="#g-plus"/></svg></span>FAQ</p>
+      <h2>Questions, answered plainly.</h2>
+      <p>Ambrin is early. Where something isn't decided yet, we say so.</p>
+    </div>
+    <div class="faq-list">
+      <details open>
+        <summary>What is a credit?</summary>
+        <p>A token a provider issues against capacity it has listed: tokens of inference, seconds of GPU time, or queries against a data feed. An agent's wallet holds credits for the providers its owner has approved, and spends them per call.</p>
+      </details>
+      <details>
+        <summary>Who can see a receipt?</summary>
+        <p>The buyer and the provider. On Canton, a contract is distributed only to its stakeholders, so other participants on the network never receive it. A provider sees receipts for its own capacity and nothing about what you spend elsewhere.</p>
+      </details>
+      <details>
+        <summary>What happens when an agent hits its budget?</summary>
+        <p>The call is refused before it runs. The budget check is part of the same transaction that spends the credits, so there is no way to overspend first and settle up afterwards.</p>
+      </details>
+      <details>
+        <summary>How is this different from usage-based billing?</summary>
+        <p>Usage-based billing meters now and charges later, on the provider's count. Ambrin settles each call as it happens and gives both sides the same signed record of it.</p>
+      </details>
+      <details>
+        <summary>Do I need to write Daml or run a Canton node?</summary>
+        <p>Agent builders work through the SDK. How participant nodes are hosted is something we are working out with early-access teams, and we'll publish it when it is settled.</p>
+      </details>
+      <details>
+        <summary>What does it cost?</summary>
+        <p>Pricing isn't published yet. Providers set their own unit prices. Every number on this page is illustrative.</p>
+      </details>
+      <details>
+        <summary>Is Ambrin live?</summary>
+        <p>Not yet. Ambrin is pre-launch and onboarding a small group of agent builders and capacity providers first. Leave your email below and we'll get in touch.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta" id="access">
+  <canvas class="cta-art" id="ctaArt" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="cta-copy">
+      <h2>Meter your <span class="accent">first call.</span></h2>
+      <p>Ambrin is onboarding early agent builders and capacity providers. Tell us which side you're on and where to reach you.</p>
+      <form class="cta-form" id="ctaForm" novalidate>
+        <fieldset class="seg seg-dark">
+          <legend>I am</legend>
+          <label><input type="radio" name="role" value="builder" checked /><span>Building agents</span></label>
+          <label><input type="radio" name="role" value="provider" /><span>Providing capacity</span></label>
+        </fieldset>
+        <div class="field">
+          <label class="sr" for="email">Work email</label>
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@company.com" required />
+          <button class="btn btn-light" type="submit">Request access</button>
+        </div>
+        <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
+      </form>
+      <p class="cta-fine">Pre-launch. We'll only email you about access.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#top" class="logo logo-lg" aria-label="Ambrin home">
+          <svg class="logo-mark" width="30" height="30" aria-hidden="true"><use href="#mark"/></svg>
+          <span>Ambrin</span>
+        </a>
+        <p>Metered intelligence, settled on-ledger.</p>
+      </div>
+      <nav class="footer-cols" aria-label="Footer">
+        <div>
+          <h3>Product</h3>
+          <a href="#how">How it works</a>
+          <a href="#metered">What's metered</a>
+          <a href="#receipt">Receipts</a>
+          <a href="#audit">Audit trail</a>
+        </div>
+        <div>
+          <h3>Build</h3>
+          <a href="#developers">SDK preview</a>
+          <a href="#developers">Receipt format</a>
+          <a href="#sides">For agent builders</a>
+          <a href="#sides">For providers</a>
+        </div>
+        <div>
+          <h3>Company</h3>
+          <a href="#ledger">Why on-ledger</a>
+          <a href="#faq">FAQ</a>
+          <a href="#access">Request access</a>
+        </div>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-built">Built on the Canton Network</p>
+      <div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a></div>
+      <p class="footer-copy">&copy; 2026 Ambrin</p>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
